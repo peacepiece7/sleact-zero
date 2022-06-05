@@ -8,7 +8,7 @@ npm i react react-dom typescript @types/react @types/react-dom
 # package.lock.json
 
 - 내가 의존하고 있는 버전의 자세한 설명을 적어둠
-- package.json은 의존성을 전부 확인하긴 힘듬
+- package.json은 의존성을 전부 확인하긴 **힘듬**
 
 # code convention (prettier, eslint)
 
@@ -234,4 +234,45 @@ const Workspace: React.FC<Props> = ({ children }) => {
 };
 ```
 
-# @types
+# gravatar (feat. @types)
+
+```sh
+npm i gravatar @types/grabatar
+```
+
+### @types package를 설치해야하는 경우 확인하기
+
+- npm package검색 후 해당 package의 title을 보면 title 제일 오른쪽에 아래와 같이 적혀있다.
+
+### 1. DT
+
+- @types를 설치해야함
+
+### 2. TS
+
+- @types가 필요없는 package임 ex) redux
+
+### 3. 아무것도 없을 경우
+
+- types를 직접 작성해줘여함
+
+# menu modal (feat. event bubbling)
+
+e.stopPropagation()으로 이벤트 버블링을 막기
+
+### index.tsx
+
+```tsx
+import Menu from "@componenet/Menu"
+export default const Workspae = () => {
+  const [showUserMenu, setShowUserMenu] = useState(false)
+
+
+  return <div onClcik={}>
+    <Menu>
+    <div>profile</div>
+    <button>Logoout</button>
+    </Menu>
+  </div>
+}
+```

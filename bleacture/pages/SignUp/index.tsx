@@ -48,6 +48,7 @@ const SignUp = () => {
   if (data) {
     return <Navigate replace to="/workspace/channel" />;
   }
+
   return (
     <div id="container">
       <Header>Sleact</Header>

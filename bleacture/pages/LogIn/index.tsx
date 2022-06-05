@@ -21,7 +21,9 @@ const LogIn = () => {
           mutate('/api/users');
         })
         .catch((error) => {
-          setLogInError(error.response?.data?.statusCode === 401);
+          console.log('Login error not exist id or password, plz check your id or password status :');
+          console.dir(error);
+          setLogInError(error.response?.status === 401);
         });
     },
     [email, password],
