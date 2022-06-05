@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true, // import * as React from "react"; => import React from "react";
+    "sourceMap": true, // error source map 알려줌
+    "lib": ["ES2020", "DOM"], // 최신문법
+    "jsx": "react", // jsx가 react임을 지정 (jsx를 다른 곳에서도 씀)
+    "module": "esnext", // 최신 모듈을 씀
+    "moduleResolution": "Node", // 최신 모듈 Node가 이해
+    "target": "es5",
+    "strict": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      // 편하게 import하는거 "../../../../hello.js" -> "hooks/hello.js"
+      "@hooks/*": ["hooks/*"],
+      "@components/*": ["components/*"],
+      "@layouts/*": ["layouts/*"],
+      "@pages/*": ["pages/*"],
+      "@utils/*": ["utils/*"],
+      "@typings/*": ["typings/*"]
+    }
+  }
+}
