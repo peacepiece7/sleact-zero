@@ -276,3 +276,7 @@ export default const Workspae = () => {
   </div>
 }
 ```
+
+# input은 componenet를 분리하는게 좋음
+
+- rerendering이 전체 layout에 일어나는 것을 방지할 수 있음

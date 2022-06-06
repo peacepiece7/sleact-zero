@@ -8,7 +8,6 @@ import fetcher from '@utils/fetcher';
 
 const SignUp = () => {
   const { data, error } = useSWR('/api/users', fetcher);
-
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, , setChangePassword] = useInput('');
