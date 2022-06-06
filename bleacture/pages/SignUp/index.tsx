@@ -44,9 +44,7 @@ const SignUp = () => {
     [passwordCheck],
   );
 
-  if (data) {
-    return <Navigate replace to="/workspace/channel" />;
-  }
+  if (data) return <Navigate replace to="/workspace/sleact/channel/일반" />;
 
   return (
     <div id="container">

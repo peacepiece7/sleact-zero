@@ -21,15 +21,20 @@ import {
   ProfileModal,
   WorkspaceButton,
   AddButton,
+  WorkspaceModal,
 } from '@layouts/Workspace/style';
 import { IUser } from '@typings/db';
 import { Button, Input, Label } from '@pages/SignUp/styles';
 import useInput from '@hooks/useInput';
+import { useParams } from 'react-router';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 const Menu = loadable(() => import('@components/Menu'));
 const Modal = loadable(() => import('@components/Modal'));
+const CreateChannelModal = loadable(() => import('@components/CreateChannelModal'));
+const InviteWorkspaceModal = loadable(() => import('@components/InvaiteWorkspaceModal'));
+const InviteChannelModal = loadable(() => import('@components/InvaiteChannelModal'));
 
 type Props = {
   title?: string;
@@ -37,18 +42,20 @@ type Props = {
 };
 
 const Workspace: React.FC<Props> = () => {
+  const { workspace } = useParams<{ workspace: string }>();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModdal] = useState(false);
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
+  const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] = useState(false);
+  const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkpsace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
-  const {
-    data: userData,
-    error,
-    mutate,
-  } = useSWR('/api/users', fetcher, {
+  const { data: userData, mutate } = useSWR('/api/users', fetcher, {
     dedupingInterval: 3000,
   });
-  const onLogout = useCallback(() => {
+  const { data: channelData } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
+  const onLogOut = useCallback(() => {
     axios
       .post('/api/users/logout', null, { withCredentials: true })
       .then(() => mutate('/api/users'))
@@ -97,7 +104,16 @@ const Workspace: React.FC<Props> = () => {
 
   const onCloseModal = useCallback(() => {
     setShowCreateWorkspaceModdal(false);
+    setShowCreateChannelModal(false);
   }, []);
+
+  const toggleWorkspaceModal = useCallback(() => {
+    setShowWorkspaceModal((prev) => !prev);
+  }, []);
+  const onClickAddChannel = useCallback(() => {
+    setShowCreateChannelModal(true);
+  }, []);
+  const onClickInvaiteWorkspace = useCallback(() => {}, []);
 
   if (!userData) return <Navigate replace to="/login" />;
   return (
@@ -114,7 +130,7 @@ const Workspace: React.FC<Props> = () => {
                     <span id="profile-active">Active</span>
                   </div>
                 </ProfileModal>
-                <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
+                <LogOutButton onClick={onLogOut}>로그아웃</LogOutButton>
               </Menu>
             )}
             <ProfileImg src={gravatar.url(userData.email, { s: '35', d: 'retro' })}></ProfileImg>
@@ -133,8 +149,19 @@ const Workspace: React.FC<Props> = () => {
           <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
         </Workspaces>
         <Channels>
-          <WorkspaceName>Sleact</WorkspaceName>
-          <MenuScroll>Scroll</MenuScroll>
+          <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
+          <MenuScroll>
+            <Menu show={showWorkspaceModal} onCloseModal={toggleWorkspaceModal} style={{ top: 95, left: 80 }}>
+              <WorkspaceModal>
+                <h2>Sleact</h2>
+                <button onClick={onClickAddChannel}>채널 만들기</button>
+                <button onClick={onLogOut}>로그아웃</button>
+              </WorkspaceModal>
+            </Menu>
+            {channelData?.map((v: any) => {
+              return <div key={v.id}>{v.name}</div>;
+            })}
+          </MenuScroll>
         </Channels>
         <Chats>
           <Routes>
@@ -156,6 +183,21 @@ const Workspace: React.FC<Props> = () => {
           <Button type="submit">생성하기</Button>
         </form>
       </Modal>
+      <CreateChannelModal
+        show={showCreateChannelModal}
+        onCloseModal={onCloseModal}
+        setShowCreateChannelModal={setShowCreateChannelModal}
+      ></CreateChannelModal>
+      <InviteWorkspaceModal
+        show={showInviteWorkspaceModal}
+        onCloseModal={onCloseModal}
+        setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
+      ></InviteWorkspaceModal>
+      <InviteChannelModal
+        show={showInviteChannelModal}
+        onCloseModal={onCloseModal}
+        setShowInviteChannelModal={setShowInviteChannelModal}
+      ></InviteChannelModal>
     </div>
   );
 };

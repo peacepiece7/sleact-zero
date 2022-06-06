@@ -30,18 +30,8 @@ const LogIn = () => {
   );
 
   // let missmatchError = false 랜더링 될 때 마다 적용되서 항상 false가 유지됨
-  if (data === undefined) {
-    return <div>로딩중...</div>;
-  }
-
-  if (data) {
-    return <Navigate replace to="/workspace/channel" />;
-  }
-  // console.log(error, userData);
-  // if (!error && userData) {
-  //   console.log('로그인됨', userData);
-  //   return <Redirect to="/workspace/sleact/channel/일반" />;
-  // }
+  if (data === undefined) return <div>로딩중...</div>;
+  if (data) return <Navigate replace to="/workspace/sleact/channel/일반" />;
 
   return (
     <div id="container">
