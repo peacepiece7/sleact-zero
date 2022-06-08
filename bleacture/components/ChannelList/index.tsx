@@ -13,14 +13,12 @@ const ChannelList: FC = () => {
   const {
     data: userData,
     error,
-
     mutate,
   } = useSWR<IUser>('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
   });
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const [channelCollapse, setChannelCollapse] = useState(false);
-
   const toggleChannelCollapse = useCallback(() => {
     setChannelCollapse((prev) => !prev);
   }, []);

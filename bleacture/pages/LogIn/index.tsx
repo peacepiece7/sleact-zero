@@ -1,5 +1,5 @@
 import useInput from '@hooks/useInput';
-import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from '@pages/SignUp/styles';
+import { Form, Error, Label, Input, LinkContainer, Button, Header } from '@pages/SignUp/styles';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import React, { useCallback, useState } from 'react';
@@ -7,7 +7,7 @@ import { Link, Navigate } from 'react-router-dom';
 import useSWR from 'swr';
 
 const LogIn = () => {
-  const { data, error, mutate } = useSWR('/api/users', fetcher);
+  const { data, mutate } = useSWR('/api/users', fetcher);
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -26,7 +26,7 @@ const LogIn = () => {
           setLogInError(error.response?.status === 401);
         });
     },
-    [email, password],
+    [email, password, mutate],
   );
 
   // let missmatchError = false 랜더링 될 때 마다 적용되서 항상 false가 유지됨

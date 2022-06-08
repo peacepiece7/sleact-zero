@@ -59,6 +59,8 @@ const Workspace: React.FC<Props> = () => {
   const { data: channelData } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const { data: memberData } = useSWR(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
 
+  console.log(channelData);
+  console.log(memberData);
   const onLogout = useCallback(() => {
     axios
       .post('/api/users/logout', null, { withCredentials: true })

@@ -280,3 +280,21 @@ export default const Workspae = () => {
 # input은 componenet를 분리하는게 좋음
 
 - rerendering이 전체 layout에 일어나는 것을 방지할 수 있음
+
+# deepth error eslinting하기
+
+.eslint에 react-app 추가하고 아래 패키지 다운로드
+
+```json
+{
+  "extends": ["plugin:prettier/recommended", "react-app"],
+  "parser": "babel-eslint"
+}
+```
+
+```cmd
+npm i -D eslint-plugin-flowtype eslint-plugin-import eslint-plugin-jsx-a11y eslint-config-react-app
+```
+
+근데 나는 에러가 안나네
+eslint 적용이안됨

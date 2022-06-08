@@ -7,7 +7,7 @@ import useInput from '@hooks/useInput';
 import fetcher from '@utils/fetcher';
 
 const SignUp = () => {
-  const { data, error } = useSWR('/api/users', fetcher);
+  const { data } = useSWR('/api/users', fetcher);
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, , setChangePassword] = useInput('');
@@ -34,14 +34,14 @@ const SignUp = () => {
       setChangePassword(e.target.value);
       setMismatchError(e.target.value !== passwordCheck);
     },
-    [password],
+    [passwordCheck, setChangePassword, setMismatchError],
   );
   const onChangePasswordCheck = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setChangePasswordCheck(e.target.value);
       setMismatchError(e.target.value !== password);
     },
-    [passwordCheck],
+    [password, setChangePasswordCheck, setMismatchError],
   );
 
   if (data) return <Navigate replace to="/workspace/sleact/channel/일반" />;
