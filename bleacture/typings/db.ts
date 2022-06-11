@@ -22,9 +22,10 @@ export interface IChat {
   UserId: number;
   User: IUser; // 보낸 사람
   content: string;
-  createdAt: Date;
+  createdAt: Date | number | any;
   ChannelId: number;
   Channel: IChannel;
+  Sender?: IUser;
 }
 
 export interface IDM {
@@ -35,7 +36,7 @@ export interface IDM {
   ReceiverId: number; // 받는 사람 아이디
   Receiver: IUser;
   content: string;
-  createdAt: Date;
+  createdAt: Date | number | any;
 }
 
 export interface IWorkspace {

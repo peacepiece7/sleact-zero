@@ -18,8 +18,12 @@ const InviteWorkspaceModal: FC<Props> = ({ show, onCloseModal, setShowInviteWork
   const { workspace } = useParams<{ workspace: string; channel: string }>();
   const [newMember, onChangeNewMember, setNewMember] = useInput('');
   const { data: userData } = useSWR<IUser>('/api/users', fetcher);
-  const { mutate } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
+  const { data: memberData, mutate } = useSWR<IChannel[]>(
+    userData ? `/api/workspaces/${workspace}/members` : null,
+    fetcher,
+  );
 
+  console.log('invaiteWOrksapce Modal memberdata :', memberData);
   const onInviteMember = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -30,7 +34,7 @@ const InviteWorkspaceModal: FC<Props> = ({ show, onCloseModal, setShowInviteWork
         .post(`/api/workspaces/${workspace}/members`, {
           email: newMember,
         })
-        .then((response) => {
+        .then(() => {
           mutate();
           setShowInviteWorkspaceModal(false);
           setNewMember('');

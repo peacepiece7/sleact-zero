@@ -1,20 +1,16 @@
-// import useSocket from '@hooks/useSocket';
+import useSocket from '@hooks/useSocket';
 import { CollapseButton } from '@components/DMList/styles';
 import { IChannel, IUser } from '@typings/db';
 import fetcher from '@utils/fetcher';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import useSWR from 'swr';
 
 const ChannelList: FC = () => {
   const { workspace } = useParams<{ workspace?: string }>();
-  // const [socket] = useSocket(workspace);
-  const {
-    data: userData,
-    error,
-    mutate,
-  } = useSWR<IUser>('/api/users', fetcher, {
+  const [socket] = useSocket(workspace);
+  const { data: userData } = useSWR<IUser>('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
   });
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
@@ -23,6 +19,15 @@ const ChannelList: FC = () => {
     setChannelCollapse((prev) => !prev);
   }, []);
 
+  console.log('connected follow socket :', socket);
+
+  useEffect(() => {
+    socket?.on('onlineList', (data: any) => {
+      console.log('socket online data :', data);
+    });
+
+    socket.off('onlineList');
+  }, [socket]);
   return (
     <>
       <h2>

@@ -33,7 +33,7 @@ const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 const Menu = loadable(() => import('@components/Menu'));
 const Modal = loadable(() => import('@components/Modal'));
 const CreateChannelModal = loadable(() => import('@components/CreateChannelModal'));
-const InviteWorkspaceModal = loadable(() => import('@components/InvaiteWorkspaceModal'));
+const InviteWorkspaceModal = loadable(() => import('@components/InviteWorkspaceModal'));
 const InviteChannelModal = loadable(() => import('@components/InvaiteChannelModal'));
 const ChannelList = loadable(() => import('@components/ChannelList'));
 const DMList = loadable(() => import('@components/DMList'));
@@ -60,7 +60,6 @@ const Workspace: React.FC<Props> = () => {
   const { data: channelData } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const { data: memberData } = useSWR(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
   const [socket, disconnet] = useSocket(workspace);
-  console.log(memberData);
   useEffect(() => {
     if (channelData && userData && socket) {
       socket.emit('login', { id: userData.id, channels: channelData.map((v: any) => v.id) });
@@ -71,6 +70,7 @@ const Workspace: React.FC<Props> = () => {
       disconnet();
     };
   }, [workspace, disconnet]);
+  console.log('workspace memberData :', memberData);
   const onLogout = useCallback(() => {
     axios
       .post('/api/users/logout', null, { withCredentials: true })

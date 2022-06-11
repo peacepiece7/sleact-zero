@@ -392,37 +392,37 @@ router.get(
       if (!workspace) {
         return res.status(404).send("존재하지 않는 워크스페이스입니다.");
       }
-      return res.json(
-        await workspace.getDMs({
-          where: {
-            [Op.or]: [
-              {
-                SenderId: req.user.id,
-                ReceiverId: req.params.id,
-              },
-              {
-                SenderId: req.params.id,
-                ReceiverId: req.user.id,
-              },
-            ],
-          },
-          include: [
+      const chatData = await workspace.getDMs({
+        where: {
+          [Op.or]: [
             {
-              model: User,
-              as: "Sender",
-              attributes: ["nickname", "id", "email"],
+              SenderId: req.user.id,
+              ReceiverId: req.params.id,
             },
             {
-              model: User,
-              as: "Receiver",
-              attributes: ["nickname", "id", "email"],
+              SenderId: req.params.id,
+              ReceiverId: req.user.id,
             },
           ],
-          order: [["createdAt", "DESC"]],
-          limit: parseInt(req.query.perPage, 10),
-          offset: req.query.perPage * (req.query.page - 1),
-        })
-      );
+        },
+        include: [
+          {
+            model: User,
+            as: "Sender",
+            attributes: ["nickname", "id", "email"],
+          },
+          {
+            model: User,
+            as: "Receiver",
+            attributes: ["nickname", "id", "email"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(req.query.perPage, 10),
+        offset: req.query.perPage * (req.query.page - 1),
+      });
+      console.log("chat data , plz check follow! : ", chatData);
+      return res.send(chatData);
     } catch (error) {
       next(error);
     }
