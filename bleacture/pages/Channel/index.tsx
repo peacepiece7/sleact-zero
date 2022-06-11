@@ -6,15 +6,15 @@ import { Container, Header } from './styles';
 
 import ChatBox from '@components/ChatBox';
 import axios from 'axios';
-import useSWR from 'swr';
+// import useSWR from 'swr';
 
 const Channel = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
   const [chat, onChangeChat] = useInput('');
-  const { data: chatData, mutate } = useSWR(
-    () => `/api/workspace/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`,
-  );
-  console.log(chatData);
+  // const { data: chatData, mutate } = useSWR(
+  //   () => `/api/workspace/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`,
+  // );
+
   const onSubmitForm = useCallback(
     (e: React.ChangeEvent<HTMLDListElement>) => {
       e.preventDefault();
@@ -24,12 +24,12 @@ const Channel = () => {
             content: chat,
           })
           .then(() => {
-            mutate(`/api/workspace/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
+            // mutate(`/api/workspace/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
           })
           .catch((error) => console.error(error));
       }
     },
-    [workspace, chat, id, mutate],
+    [workspace, chat, id],
   );
 
   return (

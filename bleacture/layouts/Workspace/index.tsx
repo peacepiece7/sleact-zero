@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import useSWR, { MutatorCallback } from 'swr';
+import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import gravatar from 'gravatar';
@@ -26,6 +26,7 @@ import {
 import { Button, Input, Label } from '@pages/SignUp/styles';
 import useInput from '@hooks/useInput';
 import { useParams } from 'react-router';
+import useSocket from '@hooks/useSocket';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
@@ -58,9 +59,18 @@ const Workspace: React.FC<Props> = () => {
   });
   const { data: channelData } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const { data: memberData } = useSWR(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
-
-  console.log(channelData);
+  const [socket, disconnet] = useSocket(workspace);
   console.log(memberData);
+  useEffect(() => {
+    if (channelData && userData && socket) {
+      socket.emit('login', { id: userData.id, channels: channelData.map((v: any) => v.id) });
+    }
+  });
+  useEffect(() => {
+    return () => {
+      disconnet();
+    };
+  }, [workspace, disconnet]);
   const onLogout = useCallback(() => {
     axios
       .post('/api/users/logout', null, { withCredentials: true })
@@ -177,7 +187,7 @@ const Workspace: React.FC<Props> = () => {
         <Chats>
           <Routes>
             <Route path="/channel/:channel" element={<Channel />}></Route>
-            <Route path="/dm/:workspace" element={<DirectMessage />}></Route>
+            <Route path="/dm/:id" element={<DirectMessage />}></Route>
           </Routes>
         </Chats>
       </WorkspaceWrapper>
