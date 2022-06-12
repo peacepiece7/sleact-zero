@@ -22,7 +22,6 @@ const CreateChannelModal: React.FC<Props> = ({ onCloseModal, show, setShowCreate
     dedupingInterval: 2000, // 2초
   });
   const { data: channelData, mutate } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
-  console.log(channelData?.length);
   const onCreateChannel = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();

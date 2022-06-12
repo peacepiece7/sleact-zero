@@ -60,7 +60,7 @@ const Workspace: React.FC<Props> = () => {
   const { data: channelData } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const { data: memberData } = useSWR(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
   const [socket, disconnet] = useSocket(workspace);
-  console.log(memberData?.length);
+
   useEffect(() => {
     if (channelData && userData && socket) {
       socket.emit('login', { id: userData.id, channels: channelData.map((v: any) => v.id) });

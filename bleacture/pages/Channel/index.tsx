@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useParams } from 'react-router';
-import ChatList from '@components/ChatList';
+// import ChatList from '@components/ChatList';
 import useInput from '@hooks/useInput';
 import useSWR from 'swr';
 import { Container, Header } from './styles';
@@ -13,7 +13,7 @@ const Channel = () => {
   const [chat, onChangeChat] = useInput('');
 
   // 에러를 막기 위한 임시 코드 입니다!
-  const { data: chatData } = useSWR(() => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
+  // const { data: chatData } = useSWR(() => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
   const onSubmitForm = useCallback(
     (e: React.ChangeEvent<HTMLDListElement>) => {
       e.preventDefault();
@@ -34,7 +34,7 @@ const Channel = () => {
   return (
     <Container>
       <Header>Channel</Header>
-      <ChatList chatData={chatData}></ChatList>
+      {/* <ChatList chatData={chatData}></ChatList> */}
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm}></ChatBox>
     </Container>
   );

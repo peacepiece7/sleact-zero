@@ -11,4 +11,5 @@ export default function makeSection(chatList: IDM[]) {
       sections[monthDate] = [chat];
     }
   });
+  return sections;
 }

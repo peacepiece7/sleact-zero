@@ -19,8 +19,7 @@ const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholde
   const { workspace } = useParams<{ workspace: string }>();
   const { data: userData } = useSWR<IUser | false>(`/api/users`, fetcher);
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
-  console.log('memberData :', memberData);
-  console.log('workspace :', workspace);
+
   const textareaRef = useRef(null);
   useEffect(() => {
     if (textareaRef.current) {
@@ -60,6 +59,7 @@ const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholde
     },
     [memberData],
   );
+
   return (
     <ChatArea>
       <Form onSubmit={onSubmitForm}>

@@ -1,7 +1,7 @@
 import { Container, Header } from '@pages/DirectMessage/styles';
 import gravatar from 'gravatar';
 import useSWR from 'swr';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import fetcher from '@utils/fetcher';
 import makeSection from '@utils/makeSection';
 import { useParams } from 'react-router';
@@ -19,35 +19,45 @@ const DirectMessage = () => {
     () => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`,
     fetcher,
   );
+  const scrollbarRef = useRef(null);
   const onSubmitForm = useCallback(
     (e: React.ChangeEvent<HTMLDivElement>) => {
       e.preventDefault();
       if (chat?.trim()) {
-        console.log('workspace :', workspace, 'id :', id);
         axios
           .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
             content: chat,
           })
           .then(() => {
-            mutate(`/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
+            mutate(chatData);
           })
           .catch((error) => console.error(error));
       }
       e.target.textContent = '';
     },
-    [workspace, chat, id, mutate],
+    [workspace, chat, id],
   );
 
-  const chatSections = makeSection(chatData ? [].concat(...chatData).reverse() : []);
+  console.log('Chat : ', chat);
   // [...chatData].reverse()
   if (!userData || !myData) return null;
+
+  const chatSections = makeSection(
+    chatData
+      ? []
+          .concat(...chatData)
+          .flat()
+          .reverse()
+      : [],
+  );
+
   return (
     <Container>
       <Header>
         <img src={gravatar.url(userData.email, { s: '24px', d: 'retro' })} alt={userData.nickname}></img>
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList chatData={chatSections}></ChatList>;
+      <ChatList ref={scrollbarRef} chatData={chatSections}></ChatList>;
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm}></ChatBox>
     </Container>
   );
