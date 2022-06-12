@@ -13,8 +13,7 @@ const Channel = () => {
   const [chat, onChangeChat] = useInput('');
 
   // 에러를 막기 위한 임시 코드 입니다!
-  const { data: chatData } = useSWR(() => `/api/workspace/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
-  console.log('Channel :', chatData);
+  const { data: chatData } = useSWR(() => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
   const onSubmitForm = useCallback(
     (e: React.ChangeEvent<HTMLDListElement>) => {
       e.preventDefault();
@@ -24,7 +23,7 @@ const Channel = () => {
             content: chat,
           })
           .then(() => {
-            // mutate(`/api/workspace/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
+            // mutate(`/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
           })
           .catch((error) => console.error(error));
       }

@@ -6,7 +6,8 @@ const useInput = <T>(initialData: T): ReturnTypes<T> => {
   const [value, setValue] = useState(initialData);
   const handler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     //prettier-ignore
-    setValue((e.currentTarget.value as unknown) as T);
+    if(e?.target?.value) setValue((e.target.value as unknown) as T);
+    else console.log('plz check the follwing event :', e)
   }, []);
   return [value, handler, setValue];
 };

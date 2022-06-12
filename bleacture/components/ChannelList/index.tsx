@@ -19,12 +19,8 @@ const ChannelList: FC = () => {
     setChannelCollapse((prev) => !prev);
   }, []);
 
-  console.log('connected follow socket :', socket);
-
   useEffect(() => {
-    socket?.on('onlineList', (data: any) => {
-      console.log('socket online data :', data);
-    });
+    socket?.on('onlineList', () => {});
 
     socket.off('onlineList');
   }, [socket]);

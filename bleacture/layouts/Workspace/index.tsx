@@ -60,6 +60,7 @@ const Workspace: React.FC<Props> = () => {
   const { data: channelData } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const { data: memberData } = useSWR(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
   const [socket, disconnet] = useSocket(workspace);
+  console.log(memberData?.length);
   useEffect(() => {
     if (channelData && userData && socket) {
       socket.emit('login', { id: userData.id, channels: channelData.map((v: any) => v.id) });
@@ -70,12 +71,11 @@ const Workspace: React.FC<Props> = () => {
       disconnet();
     };
   }, [workspace, disconnet]);
-  console.log('workspace memberData :', memberData);
   const onLogout = useCallback(() => {
     axios
       .post('/api/users/logout', null, { withCredentials: true })
       .then(() => mutate('/api/users'))
-      .catch((error) => console.log(error.response.data));
+      .catch((error) => console.error(error.response.data));
   }, []);
 
   const onCloseUserProfile = useCallback((e: React.MouseEvent<HTMLDivElement>) => {

@@ -1,14 +1,12 @@
-import { CloseModalButton } from '@components/Menu/styles';
 import Modal from '@components/Modal';
 import useInput from '@hooks/useInput';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
 import { Label, Input, Button } from '@pages/SignUp/styles';
 import axios from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router';
-import { workerData } from 'worker_threads';
 
 interface Props {
   show: boolean;
@@ -18,12 +16,13 @@ interface Props {
 }
 
 const CreateChannelModal: React.FC<Props> = ({ onCloseModal, show, setShowCreateChannelModal }) => {
-  const { workspace, channel } = useParams<{ workspace: string; channel: string }>();
+  const { workspace } = useParams<{ workspace: string; channel: string }>();
   const [newChannel, onChangeNewChannel, setnewChannel] = useInput('');
-  const { data: userData, error } = useSWR('/api/users', fetcher, {
+  const { data: userData } = useSWR('/api/users', fetcher, {
     dedupingInterval: 2000, // 2초
   });
   const { data: channelData, mutate } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
+  console.log(channelData?.length);
   const onCreateChannel = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();

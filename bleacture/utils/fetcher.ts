@@ -6,7 +6,7 @@ const fetcher = (url: string) =>
     .then((response) => response.data)
     .catch((error) => {
       console.error(error);
-      return error;
+      return undefined;
     });
 // fetcherPost = (url :string, data? : obejct) => axios.get(url, {withCrednetials : ture}) ...
 export default fetcher;

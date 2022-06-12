@@ -3,6 +3,7 @@ import gravatar from 'gravatar';
 import useSWR from 'swr';
 import React, { useCallback } from 'react';
 import fetcher from '@utils/fetcher';
+import makeSection from '@utils/makeSection';
 import { useParams } from 'react-router';
 import useInput from '@hooks/useInput';
 import axios from 'axios';
@@ -11,7 +12,6 @@ import ChatBox from '@components/ChatBox';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
-  console.log('direct message api checker :', 'workspace :', workspace, 'id :', id);
   const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
   const { data: myData } = useSWR(`/api/users`, fetcher);
   const [chat, onChangeChat] = useInput('');
@@ -20,22 +20,26 @@ const DirectMessage = () => {
     fetcher,
   );
   const onSubmitForm = useCallback(
-    (e: React.ChangeEvent<HTMLDListElement>) => {
+    (e: React.ChangeEvent<HTMLDivElement>) => {
       e.preventDefault();
       if (chat?.trim()) {
+        console.log('workspace :', workspace, 'id :', id);
         axios
           .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
             content: chat,
           })
           .then(() => {
-            mutate(`/api/workspace/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
+            mutate(`/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`);
           })
           .catch((error) => console.error(error));
       }
+      e.target.textContent = '';
     },
     [workspace, chat, id, mutate],
   );
 
+  const chatSections = makeSection(chatData ? [].concat(...chatData).reverse() : []);
+  // [...chatData].reverse()
   if (!userData || !myData) return null;
   return (
     <Container>
@@ -43,7 +47,7 @@ const DirectMessage = () => {
         <img src={gravatar.url(userData.email, { s: '24px', d: 'retro' })} alt={userData.nickname}></img>
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList chatData={chatData}></ChatList>;
+      <ChatList chatData={chatSections}></ChatList>;
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm}></ChatBox>
     </Container>
   );

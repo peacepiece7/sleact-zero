@@ -298,3 +298,129 @@ npm i -D eslint-plugin-flowtype eslint-plugin-import eslint-plugin-jsx-a11y esli
 
 근데 나는 에러가 안나네
 eslint 적용이안됨
+
+# dayjs vs moment vs date-fns
+
+- date-fns
+  - lodash 방식
+- dayjs
+  - moment 상위 호환
+  - 불변성이 지켜지고 가벼움
+- momnet (luxon)
+
+  - 불변성이 지켜지지 않음 (객체가 복사됨)
+  - luxon이라는 상위호환 패키지가 나옴
+
+- 결론 : luxon, dayjs, date-fns중 고르면 됨 (immutable)
+
+# function call
+
+```js
+function foo(){}
+foo()
+foo.call()
+foo.apply()
+foo.bind()()
+foo.`` // tagged templete literal
+foo.`123`
+```
+
+### emotion의 tagged templete literal도 함수 호출의 한 문법
+
+- 아래와 같이 변수명을 작성할 수 있음
+- `` tagged 안에 오는 문자열이 하나의 인자로 적용됨
+
+```ts
+export const EachMention = styled.button<{ focus: boolean }>`
+  display: flex;
+  & img {
+    margin-right: 5px;
+  }
+  ${({ focus }) =>
+    focus &&
+    `
+    background: #1264a3;
+    color: white;
+  `};
+`;
+```
+
+# emotion, 외부 라이브러리를 styling하기
+
+- react-mentions는 기본적으로 아래와 같이 사용됨
+
+```tsx
+<MentionsInput>
+  <Mentions />
+</MentionsInput>
+```
+
+- emtion을 사용해서 아래와 같이 외부 라이브러리의 style을 확장할 수 있음
+
+```tsx
+// styles.tsx
+export const MentionsTextarea = styled(MentionsInput)`
+  display: flex;
+  & img {
+    margin-right: 5px;
+  }
+`
+// ChatBox.tsx
+
+<MentionsTextarea>
+  <Mentions />
+</MentionsTextarea>
+```
+
+# memo, useMemo, useCallback
+
+- memo
+  - componenet의 props가 같을 경우 자식이 rerendering되지 않게 해줌
+- useMemo
+  - hooks의 결과를 캐싱할 때 사용
+  - 값을 반환함 (캐싱할 값)
+- useCallback
+  - hooks자체를 캐싱할 때 사용
+  - 함수 자체를 캐싱 (dependency가 변하지 않으면 결과 값이 변하지 않는다)
+
+```tsx
+// result에 함수의 실행 결과를 캐싱함
+const result = useMemo(
+  () =>
+    regexifyString({
+      input: data.content,
+      decorator() {
+        // .. some large logic ..
+        return <div>{result}</div>;
+      },
+    }),
+  [data.content], // result가 변경되야할 떄를 알려주는 trigger (dependency)를 배열로 작성
+);
+
+// result에 캐싱할 함수를 반환함
+const [cnt, setCnt] = useState(0);
+const result = useCallback(
+  () => {
+    setCnt((pref) => pref + 1);
+    regexifyString({
+      input: data.content,
+      decorator() {
+        // .. some large logic ..
+        return <div>{cnt}</div>;
+      },
+    });
+  },
+  [data.content], // result가 변경되야할 떄를 알려주는 trigger (dependency)를 배열로 작성
+);
+
+result();
+
+// result()가 5번 호출 되었지만 data.content가 변하지 않음 => 0만 5번 출력됨 (cnt는 5까지 증가함)
+// 6번째 클릭하는데 data.content가 변함 => cnt는 6이 출력됨
+```
+
+# server의 부담을 줄여주자 (feat. 날짜별로 데이터 묶기)
+
+가공해야할 데이터가 많을 경우, 서버는 데이터를 제공하는 역할만 하고 프론트에서 가공하는게 좋음
+
+서버가 cpu를 잡아먹는 작업이 많아질 수록 서비스가 터질 확률이 높아지기떄문 (nodejs는 싱글 스레드기 때문에 promise나 긴 로직에 매우 취약함)

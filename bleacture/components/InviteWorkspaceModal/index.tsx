@@ -23,7 +23,6 @@ const InviteWorkspaceModal: FC<Props> = ({ show, onCloseModal, setShowInviteWork
     fetcher,
   );
 
-  console.log('invaiteWOrksapce Modal memberdata :', memberData);
   const onInviteMember = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();

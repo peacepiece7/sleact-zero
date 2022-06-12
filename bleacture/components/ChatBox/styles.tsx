@@ -15,8 +15,8 @@ export const Form = styled.form`
   border-radius: 4px;
   border: 1px solid rgb(29, 28, 29);
 `;
-// styled(MentionsInput)
-export const MentionsTextarea = styled.textarea`
+// & => nested selector
+export const MentionsTextarea = styled(MentionsInput)`
   font-family: Slack-Lato, appleLogo, sans-serif;
   font-size: 15px;
   padding: 8px 9px;
