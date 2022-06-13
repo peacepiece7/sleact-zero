@@ -9,12 +9,13 @@ import useInput from '@hooks/useInput';
 import axios from 'axios';
 import ChatList from '@components/ChatList';
 import ChatBox from '@components/ChatBox';
+import { IDM } from '@typings/db';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
   const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
   const { data: myData } = useSWR(`/api/users`, fetcher);
-  const [chat, onChangeChat] = useInput('');
+  const [chat, onChangeChat, setChat] = useInput('');
   const { data: chatData, mutate } = useSWR(
     () => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${20}&page=${1}`,
     fetcher,
@@ -33,18 +34,16 @@ const DirectMessage = () => {
           })
           .catch((error) => console.error(error));
       }
-      e.target.textContent = '';
+      setChat('');
     },
-    [workspace, chat, id],
+    [workspace, mutate, id, chatData, chat],
   );
 
-  console.log('Chat : ', chat);
-  // [...chatData].reverse()
   if (!userData || !myData) return null;
 
   const chatSections = makeSection(
     chatData
-      ? []
+      ? ([] as IDM[])
           .concat(...chatData)
           .flat()
           .reverse()
@@ -58,7 +57,13 @@ const DirectMessage = () => {
         <span>{userData.nickname}</span>
       </Header>
       <ChatList ref={scrollbarRef} chatData={chatSections}></ChatList>;
-      <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm}></ChatBox>
+      <ChatBox
+        chat={chat}
+        onChangeChat={onChangeChat}
+        onSubmitForm={onSubmitForm}
+        placeholder={`Message ${userData.nickname}`}
+        data={[]}
+      ></ChatBox>
     </Container>
   );
 };

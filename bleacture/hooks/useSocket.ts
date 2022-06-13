@@ -1,15 +1,14 @@
 import io from 'socket.io-client';
 import { useCallback } from 'react';
-// import axios from 'axios';
-
-const sockets: { [key: string]: any } = {};
+import { Socket } from 'webpack-dev-server';
 
 const backUrl = 'http://localhost:3095';
 
-// namespace, room (workspace(slack) = namespace(socket), channel(slack) = namespace(socket)
-const useSocket = (workspace?: string): [any | undefined, () => void] => {
+const sockets: { [key: string]: any } = {};
+// namespace, room (workspace(slack) = namespconst sockets: { [key: string]: any } = {};ace(socket), channel(slack) = namespace(socket)
+const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
   const disconnect = useCallback(() => {
-    if (workspace) {
+    if (workspace && sockets[workspace]) {
       sockets[workspace].disconnect();
       delete sockets[workspace];
     }
@@ -22,19 +21,10 @@ const useSocket = (workspace?: string): [any | undefined, () => void] => {
     sockets[workspace] = io(`${backUrl}/ws-${workspace}`, {
       transports: ['websocket'], // 폴링하지않고 바로 websocket을 씀 (폴링 : socket연결 전 http요청을 보내는 행위)
     });
+    console.info('create socket', workspace, sockets[workspace]);
   }
 
   return [sockets[workspace], disconnect];
 };
 
 export default useSocket;
-
-// const sockets = io.connect(`${backUrl}/ws-${workspace}}`);
-// socket.emit('hello', 'world');
-// socket.on('message', (data: string) => {
-//   console.log(data);
-// });
-// socket.on('onlineList', (data: []) => {
-//   console.log(data);
-// });
-// socket.disconnect();

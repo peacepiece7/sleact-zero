@@ -39,7 +39,9 @@ const DMList: FC = () => {
     return () => {
       // socket?.off('dm', onMessage);
       // console.log('socket off dm', socket?.hasListeners('dm'));
-      socket?.off('onlineList');
+      socket?.off('onlineList', (arr) => {
+        console.log(arr);
+      });
     };
   }, [socket]);
 

@@ -13,9 +13,10 @@ interface Props {
   onSubmitForm: (e: any) => void;
   onChangeChat: (e: any) => void;
   placeholder?: string;
+  data?: IUser[];
 }
 
-const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) => {
+const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder, data }) => {
   const { workspace } = useParams<{ workspace: string }>();
   const { data: userData } = useSWR<IUser | false>(`/api/users`, fetcher);
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
@@ -26,10 +27,12 @@ const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholde
       autosize(textareaRef.current);
     }
   }, []);
+
   const onKeydownChat = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') {
         if (!e.shiftKey) {
+          e.preventDefault();
           onSubmitForm(e);
         }
       }
@@ -37,27 +40,48 @@ const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholde
     [onSubmitForm],
   );
 
-  const renderSuggestion = useCallback(
-    (
-      suggestion: SuggestionDataItem,
-      search: string,
-      highlightedDisplay: React.ReactNode,
-      index: number,
-      focused: boolean,
-    ): React.ReactNode => {
-      if (!memberData) return;
+  // const renderUserSuggestion = useCallback(
+  //   (
+  //     suggestion: SuggestionDataItem,
+  //     search: string,
+  //     highlightedDisplay: React.ReactNode,
+  //     index: number,
+  //     focused: boolean,
+  //   ): React.ReactNode => {
+  //     if (!memberData) return;
 
+  //     return (
+  //       <EachMention focus={focused}>
+  //         <img
+  //           src={gravatar.url(memberData[index].email, { s: '20px', d: 'retro' })}
+  //           alt={memberData[index].nickname}
+  //         />
+  //         <span>{highlightedDisplay}</span>
+  //       </EachMention>
+  //     );
+  //   },
+  //   [memberData],
+  // );
+
+  const renderUserSuggestion: (
+    suggestion: SuggestionDataItem,
+    search: string,
+    highlightedDisplay: React.ReactNode,
+    index: number,
+    focused: boolean,
+  ) => React.ReactNode = useCallback(
+    (member, search, highlightedDisplay, index, focus) => {
+      if (!data) {
+        return null;
+      }
       return (
-        <EachMention focus={focused}>
-          <img
-            src={gravatar.url(memberData[index].email, { s: '20px', d: 'retro' })}
-            alt={memberData[index].nickname}
-          />
+        <EachMention focus={focus}>
+          <img src={gravatar.url(data[index].email, { s: '20px', d: 'retro' })} alt={data[index].nickname} />
           <span>{highlightedDisplay}</span>
         </EachMention>
       );
     },
-    [memberData],
+    [data],
   );
 
   return (
@@ -67,7 +91,7 @@ const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholde
           id="editor-chat"
           value={chat}
           onChange={onChangeChat}
-          onKeyDown={onKeydownChat}
+          onKeyPress={onKeydownChat}
           placeholder={placeholder}
           inputRef={textareaRef}
           allowSuggestionsAboveCursor
@@ -76,7 +100,7 @@ const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholde
             appendSpaceOnAdd
             trigger="@"
             data={memberData?.map((v) => ({ id: v.id, display: v.nickname })) || []}
-            renderSuggestion={renderSuggestion}
+            renderSuggestion={renderUserSuggestion}
           ></Mention>
         </MentionsTextarea>
         <Toolbox>
