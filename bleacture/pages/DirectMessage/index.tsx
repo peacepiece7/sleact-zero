@@ -2,7 +2,7 @@ import { Container, Header } from '@pages/DirectMessage/styles';
 import gravatar from 'gravatar';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import fetcher from '@utils/fetcher';
 import makeSection from '@utils/makeSection';
 import { useParams } from 'react-router';
@@ -11,9 +11,11 @@ import axios from 'axios';
 import ChatList from '@components/ChatList';
 import ChatBox from '@components/ChatBox';
 import { IDM } from '@typings/db';
+import Scrollbars from 'react-custom-scrollbars-2';
 
 const PAGE_SIZE = 20;
 const DirectMessage = () => {
+  const scrollbarRef = useRef<Scrollbars>(null);
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
   const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
   const { data: myData } = useSWR(`/api/users`, fetcher);
@@ -27,31 +29,52 @@ const DirectMessage = () => {
     fetcher,
   );
 
-  const isEmpty = chatData?.[0]?.length === 0;
-  const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1]?.length < 20);
+  let isEmpty = chatData?.[0]?.length === 0;
+  let isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1]?.length < PAGE_SIZE) ? true : false;
 
-  const scrollbarRef = useRef(null);
   const onSubmitForm = useCallback(
     (e: React.ChangeEvent<HTMLDivElement>) => {
       e.preventDefault();
-      if (chat?.trim()) {
+      // Optimistic UI
+      if (chat?.trim() && chatData) {
+        const savedChat = chat;
+        mutate((prevChatData) => {
+          prevChatData?.[0].unshift({
+            id: (chatData[0][0]?.id || 0) + 1,
+            content: savedChat,
+            SenderId: myData.id,
+            Sender: myData,
+            ReceiverId: userData.id,
+            Receiver: userData,
+            createdAt: new Date(),
+          });
+          return prevChatData;
+        }, false).then(() => {
+          mutate(chatData);
+          setChat('');
+          if (scrollbarRef.current) {
+            console.log('scrollToBottom!', scrollbarRef.current?.getValues());
+            scrollbarRef.current.scrollToBottom();
+          }
+        });
         axios
           .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
             content: chat,
           })
-          .then(() => {
-            mutate(chatData);
-          })
-          .catch((error) => console.error(error));
+          .catch(console.error);
       }
-      setChat('');
     },
-    [workspace, mutate, id, chatData, chat],
+    [chat, workspace, id, myData, userData, chatData, mutate, setChat],
   );
+
+  useEffect(() => {
+    if (chatData?.length === 1) {
+      scrollbarRef.current?.scrollToBottom();
+    }
+  }, [chatData]);
 
   if (!userData || !myData) return null;
 
-  console.log('chat data : ', chatData);
   const chatSections = makeSection(
     chatData
       ? ([] as IDM[])
@@ -61,7 +84,6 @@ const DirectMessage = () => {
       : [],
   );
 
-  console.log('chat sections data 변경 유뮤 확인', chatSections);
   return (
     <Container>
       <Header>
@@ -76,7 +98,6 @@ const DirectMessage = () => {
         isReachingEnd={isReachingEnd}
         // scrollbarRef={undefined}
       ></ChatList>
-      ;
       <ChatBox
         chat={chat}
         onChangeChat={onChangeChat}
