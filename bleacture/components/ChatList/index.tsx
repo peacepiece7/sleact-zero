@@ -5,7 +5,6 @@ import { IDM } from '@typings/db';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
 interface Props {
-  // scrollbarRef: RefObject<Scrollbars>;
   isReachingEnd: boolean;
   isEmpty: boolean;
   chatSections: { [key: string]: IDM[] };
@@ -15,15 +14,13 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, isReachingEnd, s
   const onScroll = useCallback(
     (values: any) => {
       if (values.scrollTop === 0 && !isReachingEnd && !isEmpty) {
-        console.log('isReachingEnd', isReachingEnd, 'isEmpty', isEmpty);
-
         setSize((prev) => {
-          console.log('SET SIZE PREV :', prev);
           return prev + 1;
         }).then(() => {
-          // 스크롤 위치 유지
           const current = (ref as MutableRefObject<Scrollbars>)?.current;
-          current?.scrollTop(current?.getScrollHeight() - values.scrollHeight);
+          if (current) {
+            current.scrollTop(current.getScrollHeight() - values.scrollHeight);
+          }
         });
       }
     },
